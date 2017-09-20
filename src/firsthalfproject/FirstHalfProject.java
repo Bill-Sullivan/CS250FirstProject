@@ -6,12 +6,10 @@
 package firsthalfproject;
 // Testing Git
 
-import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Optional;
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -20,24 +18,17 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
-import javafx.util.Pair;
 import javax.imageio.ImageIO;
 
 
@@ -72,14 +63,14 @@ public class FirstHalfProject extends Application {
         
         ColorPicker colorPicker = new ColorPicker();
         
-        final Canvas canvas = new Canvas();
+        final Canvas canvas = new Canvas(250,250);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         
         
         canvas.setOnDragDetected(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent event) {
                 if (curserMode == "Line") {
-                    //dragStarted = true;
+                    dragStarted = true;
                     startDragClickX = event.getX();
                     startDragClickY = event.getY();
                 }
@@ -89,7 +80,7 @@ public class FirstHalfProject extends Application {
         canvas.setOnMouseReleased(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent event) {
                 if (curserMode == "Line") {
-                    //dragStarted = false;
+                    dragStarted = false;
                     gc.setStroke(colorPicker.getValue());
                     gc.strokeLine(startDragClickX, startDragClickY, event.getX(), event.getY());
                 }
@@ -136,6 +127,7 @@ public class FirstHalfProject extends Application {
         
         // sets the file formates that the File Chooser will show in its window
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG(*.png)", "*.png"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JPEG(*.jpg)", "*.jpg"));
         
         // this function is called when the open MenuItem is clicked on
         open.setOnAction(new EventHandler<ActionEvent>() {
@@ -144,31 +136,19 @@ public class FirstHalfProject extends Application {
                     // launches the File Chooser to open a file then stores that file in the file object
                     File file = fileChooser.showOpenDialog(primaryStage);
                     
-                    
-                    /*
-                    try {
-                        gc.clearRect(0, 0, image.getWidth(), image.getHeight());
-                    } catch (NullPointerException e) {
-                        
-                    }
-                    */
-                    
                     // converts the file to an image object for further use
                     image = new Image(new FileInputStream(file));                    
-                    System.out.println("This Happened");
+                    
                     // sets the Image that will be shown in the Viewer 
                     //imageView.setImage(image);
                     canvas.setHeight(image.getHeight());
                     canvas.setWidth(image.getWidth());
-                    
                     gc.drawImage(image, 0, 0);
                     root.add(canvas, 0, 1);
                     
                     
-                    
-                    
                     // adds the image viewer to the grid directly bellow the menu bar
-                    //root.add(imageView, 0, 1); // 
+                    // root.add(imageView, 0, 1); // 
                     // resizes the window to match the size of the image
                     primaryStage.sizeToScene();                    
                     
@@ -188,22 +168,25 @@ public class FirstHalfProject extends Application {
                  try {
                  // launches the File Chooser to select a file to save to then stores that file in the file object
                  File file = fileChooser.showSaveDialog(primaryStage);             
-                 //System.out.println(file.getCanonicalFile());
+                 System.out.println(file.getCanonicalFile());
                  
                  //stores the selected file formate in the variable fileType
                  //gets the first of the posible extentions
                  // then removes the first two charachters (*.) to get the name of the file type
                  String fileType = new String(fileChooser.getSelectedExtensionFilter().getExtensions().get(0).substring(2));
-                 //System.out.println(fileType);            
-                
+                 System.out.println(fileType);
                  
+                 // if the file name does not contain the proper extention
+                 // then rename the file so that it does
+                 if  (!(file.getPath().contains("." + fileType))) {
+                     file.renameTo(new File(file.getPath() + "." + fileType));
+                 }
                  
-                 // writes image to the selected file 
-                 WritableImage writableImage = new WritableImage((int)canvas.getWidth(), (int)canvas.getHeight());
-                 canvas.snapshot(null, writableImage);
-                 RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
-                 
-                 ImageIO.write(renderedImage, fileType, file);
+                 java.awt.image.BufferedImage notFixed= SwingFXUtils.fromFXImage(image, null);
+                 java.awt.image.BufferedImage toWrite = new java.awt.image.BufferedImage(notFixed.getWidth(), notFixed.getHeight(), java.awt.image.BufferedImage.TYPE_INT_RGB);
+                 toWrite.setRGB(0, 0, notFixed.getWidth(), notFixed.getHeight(), notFixed.getRGB(0, 0, notFixed.getWidth(), notFixed.getHeight(), null, 0, 0), 0, 0);
+                 // writes image to the selected file                  
+                 ImageIO.write(toWrite, fileType, file);
                  
                  
                 } catch (IOException e) {
@@ -214,49 +197,36 @@ public class FirstHalfProject extends Application {
         
         //stack.getChildren().addAll(root, canvas);
         
+        MenuItem newItem = new MenuItem("New");
+        newItem.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                 File blankImage = new File("Empty.png");
+                 try {
+                    image = new Image(new FileInputStream(blankImage));                    
+                    
+                    // sets the Image that will be shown in the Viewer 
+                    //imageView.setImage(image);
+                    canvas.setHeight(image.getHeight());
+                    canvas.setWidth(image.getWidth());
+                    gc.drawImage(image, 0, 0);
+                    root.add(canvas, 0, 1);
+                    
+                    //primaryStage.sizeToScene(); 
+                 } catch (FileNotFoundException e) {
+                     System.out.println("You didn;t find int");
+                     System.out.println("Working Directory = " + System.getProperty("user.dir"));
+                 }
+            }
+        });
         
-        menuFile.getItems().addAll(open, save);
+                 
+        menuFile.getItems().addAll(newItem,open, save);
         
         // --- Menu Edit
         Menu menuEdit = new Menu("Edit");
  
         // --- Menu View
         Menu menuView = new Menu("View"); 
-        MenuItem resizeCanvas = new MenuItem("Resize Canvas");
-        resizeCanvas.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent t) {
-                Dialog<Pair<String, String>> dialog = new Dialog<>();
-                
-                ButtonType loginButtonType = new ButtonType("OK", ButtonData.OK_DONE);
-                dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-                
-                TextField from = new TextField();
-                from.setPromptText("From");
-                TextField to = new TextField();
-                to.setPromptText("To");
-                
-                GridPane gridPane = new GridPane();
-                
-                gridPane.add(from, 0, 0);
-                gridPane.add(new Label("To:"), 1, 0);
-                gridPane.add(to, 2, 0);
-
-                dialog.getDialogPane().setContent(gridPane);
-                
-                Optional<Pair<String, String>> data = dialog.showAndWait();
-                
-                
-                data.ifPresent(pair -> {  
-                    System.out.println("From=" + pair.getKey() + ", To=" + pair.getValue());
-                    //canvas.resize(Double.parseDouble(pair.getKey()), Double.parseDouble(pair.getValue()));
-                });
-                
-                primaryStage.sizeToScene();
-                
-            }
-        });
-        menuView.getItems().addAll(resizeCanvas);
-        
         
         Menu menuDraw = new Menu("Draw");
         
