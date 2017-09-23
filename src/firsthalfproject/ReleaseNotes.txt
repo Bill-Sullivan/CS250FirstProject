@@ -1,0 +1,13 @@
+Version 0.2.0
+added ability to draw a line on an image in an arbitrary color
+added color picker to select color
+added ability to create a blank image
+
+Version 0.1.0
+Initial Release
+
+added the ability to view an image from a file.
+added the ability to specify/choose the file to open.
+added the menu bar.
+added the ability to save the opened file.  
+added the polite closing
