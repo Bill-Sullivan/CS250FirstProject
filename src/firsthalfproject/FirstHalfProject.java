@@ -12,7 +12,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import java.util.Optional;
+
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -21,11 +23,13 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
 import javafx.scene.control.Menu;
@@ -33,9 +37,12 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+
 import javafx.scene.image.WritableImage;
+
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.util.Pair;
 import javax.imageio.ImageIO;
@@ -49,6 +56,13 @@ public class FirstHalfProject extends Application {
     
     // variable that containes the active image
     private Image image;
+    private String curserMode = new String ("Default");
+    
+    
+    private double startDragClickX;
+    private double startDragClickY;
+    
+    private boolean dragStarted = new Boolean(false);
     
     @Override
     public void start(Stage primaryStage) {        
@@ -57,8 +71,10 @@ public class FirstHalfProject extends Application {
         // grid is arranged as (column, row)        
         GridPane root = new GridPane();
         
+
         CanvasWrapper canvasWrapper = new CanvasWrapper();
         
+
         Scene scene = new Scene(root);              
         
         // menuBar serves two purposes
@@ -92,6 +108,7 @@ public class FirstHalfProject extends Application {
         
         // sets the file formates that the File Chooser will show in its window
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG(*.png)", "*.png"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JPEG(*.jpg)", "*.jpg"));
         
         
         // this function is called when the open MenuItem is clicked on
@@ -106,6 +123,7 @@ public class FirstHalfProject extends Application {
                     canvasWrapper.drawImageOnCanvas(image);
                     root.add(canvasWrapper.getCanvas(), 0, 1);
                     
+
                     // resizes the window to match the size of the image
                     primaryStage.sizeToScene();    
                     
@@ -114,6 +132,7 @@ public class FirstHalfProject extends Application {
                 }                     
             }
         });
+
                 
         // creates a new menu item Save to be placed in the file menu
         // when pressed this item saves the image currently in use 
@@ -127,6 +146,7 @@ public class FirstHalfProject extends Application {
                  //stores the selected file formate in the variable fileType
                  //gets the first of the posible extentions
                  // then removes the first two charachters (*.) to get the name of the file type
+
                  String fileType = new String(fileChooser.getSelectedExtensionFilter().getExtensions().get(0).substring(2));                 
                  
                  // writes image to the selected file 
@@ -135,6 +155,7 @@ public class FirstHalfProject extends Application {
                  RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
                  
                  ImageIO.write(renderedImage, fileType, file);
+
                  
                  
                 } catch (IOException e) {
@@ -143,7 +164,9 @@ public class FirstHalfProject extends Application {
             }
         });
         
+
         menuFile.getItems().addAll(newItem, open, save);
+
         
         // --- Menu Edit
         Menu menuEdit = new Menu("Edit");
@@ -165,15 +188,32 @@ public class FirstHalfProject extends Application {
         });
         menuDraw.getItems().addAll(drawLine);
         
+        Menu menuDraw = new Menu("Draw");
+        
+        MenuItem drawLine = new MenuItem("Line");
+        
+        drawLine.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                curserMode = "Line";
+                
+                //gc.setStroke(colorPicker.getValue());
+                //gc.strokeLine(0, 0, image.getHeight(), image.getWidth());
+            }
+        });
+        menuDraw.getItems().addAll(drawLine);
+        
         // adds the File Edit, and View objects to the menuBar container
         menuBar.getMenus().addAll(menuFile, menuEdit, menuView, menuDraw);
+
         
         // adds the menu bar to the top of the view 
         root.add(menuBar, 0, 0);
         // Aligns the grid so that (0, 0) is in the top write
         root.setAlignment(Pos.TOP_RIGHT);
         
+
         root.add(canvasWrapper.getColorPicker(), 1, 0);
+
         
         
         primaryStage.setTitle("Image Viewer");
