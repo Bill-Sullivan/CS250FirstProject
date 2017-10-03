@@ -25,14 +25,14 @@ public class SmartSave {
     
     
     void autoSave() {
-        save(FirstHalfProject.canvasWrapper.getImageOnCanves(), lastSaveType, tempSave);
+        save(FirstHalfProject.canvasWrapper.getImageOnCanvas(), lastSaveType, tempSave);
     }
     
     void smartSave() {
         if (lastSaveAsPoint == null) {
             saveAs();
         } else {
-            save(FirstHalfProject.canvasWrapper.getImageOnCanves(), lastSaveType, lastSaveAsPoint);
+            save(FirstHalfProject.canvasWrapper.getImageOnCanvas(), lastSaveType, lastSaveAsPoint);
         }
     }    
     void saveAs() {

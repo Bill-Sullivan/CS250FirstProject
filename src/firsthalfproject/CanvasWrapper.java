@@ -29,6 +29,7 @@ public class CanvasWrapper {
     
     private String curserMode = new String ("Default");
     
+    Image imageBeforeDraw;
     
     private double startDragClickX;
     private double startDragClickY;
@@ -42,6 +43,7 @@ public class CanvasWrapper {
         
        canvas.setOnDragDetected(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent event) {
+                imageBeforeDraw = getImageOnCanvas();
                 if (curserMode == "Line" || curserMode == "Rectangle" || curserMode == "Square") {
                     startDragClickX = event.getX();
                     startDragClickY = event.getY();
@@ -55,6 +57,16 @@ public class CanvasWrapper {
         });
     canvas.setOnMouseDragged(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent event) {
+                if (curserMode == "Rectangle") {
+                    gc.drawImage(imageBeforeDraw, 0, 0);
+                    drawRectangle(startDragClickX, startDragClickY, event.getX(), event.getY());
+                }
+                if (curserMode == "Square") {
+                    gc.drawImage(imageBeforeDraw, 0, 0);
+                    drawSquare(startDragClickX, startDragClickY, event.getX(), event.getY());
+                }
+                
+                
                 if (curserMode == "FreeDraw") {
                     gc.lineTo(event.getX(), event.getY());
                     gc.moveTo(event.getX(), event.getY());
@@ -72,8 +84,12 @@ public class CanvasWrapper {
                 FirstHalfProject.smartSaveWrapper.autoSave();
             } else if (curserMode == "Rectangle") {
                 drawRectangle(startDragClickX, startDragClickY, event.getX(), event.getY());
+                FirstHalfProject.undoWrapper.updateUndoStack();
+                FirstHalfProject.smartSaveWrapper.autoSave();
             } else if (curserMode == "Square") {
                 drawSquare(startDragClickX, startDragClickY, event.getX(), event.getY());
+                FirstHalfProject.undoWrapper.updateUndoStack();
+                FirstHalfProject.smartSaveWrapper.autoSave();
             } else if (curserMode == "FreeDraw") {              
                 gc.lineTo(event.getX(), event.getY());   
                 gc.closePath();
@@ -124,7 +140,7 @@ public class CanvasWrapper {
         return canvas;
     }
     
-    Image getImageOnCanves() {
+    Image getImageOnCanvas() {
         return canvas.snapshot(null, null);
     }
     
@@ -139,8 +155,6 @@ public class CanvasWrapper {
         
         updateEnviormentalVariables();
         gc.strokeRect(x, y, width, height);
-        FirstHalfProject.undoWrapper.updateUndoStack();
-        FirstHalfProject.smartSaveWrapper.autoSave();
     }
     
     void drawSquare (double CornerOneX, double CornerOneY, double CornerTwoX, double CornerTwoY) {                       
@@ -156,8 +170,7 @@ public class CanvasWrapper {
         
         updateEnviormentalVariables();
         gc.strokeRect(x, y, width, height);
-        FirstHalfProject.undoWrapper.updateUndoStack();
-        FirstHalfProject.smartSaveWrapper.autoSave();
+        
     }
     
     Point2D findTopCorner (double CornerOneX, double CornerOneY, double CornerTwoX, double CornerTwoY) {
