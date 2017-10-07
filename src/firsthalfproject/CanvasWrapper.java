@@ -213,6 +213,7 @@ public class CanvasWrapper {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.drawImage(image, 0, 0);
         FirstHalfProject.image= canvas.snapshot(null, null);
+        FirstHalfProject.stage.sizeToScene();
         //FirstHalfProject.undoWrapper.updateUndoStack();
     }
     

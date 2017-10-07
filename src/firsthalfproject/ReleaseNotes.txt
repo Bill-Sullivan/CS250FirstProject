@@ -1,3 +1,8 @@
+Version 0.4.0
+Added undo and redo function 
+Added the ability to select and move a piece of image 
+Added the ability to recover unsaved work after exiting and reopening
+
 Version 0.3.0
 added ability to draw a square on an image in an arbitrary color
 added ability to draw a rectangle on an image in an arbitrary color

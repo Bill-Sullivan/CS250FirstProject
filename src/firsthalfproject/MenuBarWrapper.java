@@ -85,7 +85,14 @@ public class MenuBarWrapper {
             }
         });
         
-        menuFile.getItems().addAll(newItem, open, save, saveAs);
+        MenuItem recover = new MenuItem("Recover");
+        recover.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                FirstHalfProject.smartSaveWrapper.recover();
+            }
+        });
+        
+        menuFile.getItems().addAll(newItem, open, save, saveAs, recover);
         
         // --- Menu Edit
         Menu menuEdit = new Menu("Edit");

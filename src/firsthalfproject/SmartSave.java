@@ -8,10 +8,11 @@ package firsthalfproject;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
-import javafx.stage.FileChooser;
 import javax.imageio.ImageIO;
 
 /**
@@ -61,8 +62,15 @@ public class SmartSave {
             ImageIO.write(newBufferedImage, fileType, file);
         } catch (IOException e) {
             
+        }                
+    }
+    
+     void recover() {
+        try {
+            FirstHalfProject.canvasWrapper.drawImageOnCanvas(new Image(new FileInputStream("temp")));
+        } catch (FileNotFoundException e) {
+            
         }
-                
     }
 }
 
